@@ -1,5 +1,17 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const User = require('../models/userModel');
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const createToken = async (id) => {
+    try {
+        const token = await jwt.sign({ _id: id }, process.env.JWT_SECRET_KEY);
+        return token;
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 const encryptPassword = async (password) => {
     try {
@@ -36,6 +48,39 @@ const registerUser = async (req, res) => {
     }
 }
 
+const loginUser = async (req, res) => {
+    const email = req.body.email;
+    const password = (req.body.password).toString();
+    const userData = await User.findOne({ email: email });
+    if (userData) {
+        const passwordMatch = await bcryptjs.compare(password, userData.password);
+        if (passwordMatch) {
+            const tokenData = await createToken(userData._id);
+            const userResult = {
+                _id: userData._id,
+                name: userData.name,
+                email: userData.email,
+                password: userData.password,
+                image: userData.image,
+                mobile: userData.mobile,
+                type: userData.type,
+                token: tokenData
+            }
+            const response = {
+                success: true,
+                message: "User Details",
+                data: userResult,
+            }
+            res.status(200).send(response);
+        } else {
+            res.status(403).send({ success: false, message: 'Login Details are incorrect' });
+        }
+    } else {
+        res.status(403).send({ success: false, message: 'Login Details are incorrect' });
+    }
+}
+
 module.exports = {
     registerUser,
+    loginUser
 }

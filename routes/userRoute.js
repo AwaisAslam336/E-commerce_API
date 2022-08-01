@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-const { registerUser } = require('../controllers/userController');
+const { registerUser, loginUser } = require('../controllers/userController');
 const path = require('path');
 
 const userRoutes = express();
@@ -29,5 +29,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 userRoutes.post('/register', upload.single('image'), registerUser);
+
+userRoutes.post('/login', loginUser);
 
 module.exports = {userRoutes};
