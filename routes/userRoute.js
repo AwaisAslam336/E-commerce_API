@@ -3,6 +3,7 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const { registerUser, loginUser } = require('../controllers/userController');
 const path = require('path');
+const {verifyToken} = require('../middlewares/auth');
 
 const userRoutes = express();
 
@@ -31,5 +32,9 @@ const upload = multer({ storage: storage });
 userRoutes.post('/register', upload.single('image'), registerUser);
 
 userRoutes.post('/login', loginUser);
+
+userRoutes.get('/test',verifyToken, function (req, res) {
+    res.status(200).send('OKkk');
+});
 
 module.exports = {userRoutes};
