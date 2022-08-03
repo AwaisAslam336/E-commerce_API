@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-const { registerUser, loginUser } = require('../controllers/userController');
+const { registerUser, loginUser, updatePassword } = require('../controllers/userController');
 const path = require('path');
 const {verifyToken} = require('../middlewares/auth');
 
@@ -36,5 +36,7 @@ userRoutes.post('/login', loginUser);
 userRoutes.get('/test',verifyToken, function (req, res) {
     res.status(200).send('OKkk');
 });
+
+userRoutes.post('/update-password',verifyToken, updatePassword);
 
 module.exports = {userRoutes};
