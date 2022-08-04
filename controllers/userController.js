@@ -22,9 +22,9 @@ const sendResetPasswordMail = async (name, email, token) => {
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'Reset your password',
-        html: `<p>Hi `+name+`, Please click this link to <a href="http://localhost:3000//api/reset-password?token=${token}">Reset Your Password</a>.</p>`,
+        html: `<p>Hi ` + name + `, Please click this link to <a href="http://localhost:3000/api/reset-password?token=${token}">Reset Your Password</a>.</p>`,
     }
-    transporter.sendMail(mailOptions, function(err, info) {
+    transporter.sendMail(mailOptions, function (err, info) {
         if (err) {
             console.log(err);
         }
@@ -108,12 +108,12 @@ const loginUser = async (req, res) => {
 }
 
 const updatePassword = async (req, res) => {
-    const user_id = req.body.user_id;
-    const newPassword = (req.body.new_password.toString());
-    if (!user_id || !newPassword) {
-        return res.status(400).json({ success: false, message: 'user_id or new_password is missing' });
-    }
     try {
+        const user_id = req.body.user_id;
+        const newPassword = req.body.new_password ? (req.body.new_password.toString()) : null;
+        if (!user_id || !newPassword) {
+            return res.status(400).json({ success: false, message: 'user_id or new_password is missing' });
+        }
         const data = await User.findOne({ _id: user_id });
 
         if (data) {
@@ -141,7 +141,7 @@ const forgetPassword = async (req, res) => {
         if (userData) {
             const randomString = randomstring.generate();
             await User.updateOne({ email: email }, { $set: { token: randomString } });
-            sendResetPasswordMail(userData.name, userData.email, userData.token)
+            sendResetPasswordMail(userData.name, userData.email, randomString)
             res.status(200).json({
                 success: true,
                 message: "We have sent you a confirmation email, please check your email inbox"
@@ -156,9 +156,38 @@ const forgetPassword = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 }
+const resetPassword = async (req, res) => {
+
+    try {
+        const token = req.query.token;
+        const newPassword = req.body.new_password ? (req.body.new_password.toString()) : null
+        if (!token || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Request data is missing' });
+        }
+        const data = await User.findOne({ token: token });
+
+        if (data) {
+            const newSecurePassword = await encryptPassword(newPassword);
+            const user_id = data._id;
+            await User.findByIdAndUpdate({ _id: user_id },
+                { $set: { password: newSecurePassword } });
+
+            res.status(200).json({ success: true, message: "Password updated successfully." });
+        }
+        else {
+            res.status(404).json({ success: false, message: 'Token is expired or invalid.' });
+        }
+
+    }
+    catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     registerUser,
     loginUser,
     updatePassword,
-    forgetPassword
+    forgetPassword,
+    resetPassword,
 }

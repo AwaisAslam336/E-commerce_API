@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
-const { registerUser, loginUser, updatePassword, forgetPassword } = require('../controllers/userController');
+const { registerUser, loginUser, updatePassword, forgetPassword, resetPassword } = require('../controllers/userController');
 const path = require('path');
 const {verifyToken} = require('../middlewares/auth');
 
@@ -40,4 +40,7 @@ userRoutes.get('/test',verifyToken, function (req, res) {
 userRoutes.post('/update-password',verifyToken, updatePassword);
 
 userRoutes.post('/forget-password',forgetPassword);
+
+userRoutes.post('/reset-password',resetPassword);
+
 module.exports = {userRoutes};
