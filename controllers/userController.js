@@ -148,7 +148,7 @@ const forgetPassword = async (req, res) => {
             });
         }
         else {
-            res.status(404).json({ success: false, message: 'Email invalid! Please check your email' });
+            res.status(200).json({ success: false, message: 'Email invalid! Please check your email' });
         }
 
     }
@@ -169,13 +169,14 @@ const resetPassword = async (req, res) => {
         if (data) {
             const newSecurePassword = await encryptPassword(newPassword);
             const user_id = data._id;
-            await User.findByIdAndUpdate({ _id: user_id },
-                { $set: { password: newSecurePassword } });
+            const userUpdatedData = await User.findByIdAndUpdate({ _id: user_id },
+                { $set: { password: newSecurePassword, token: '' } },
+                { new: true });
 
-            res.status(200).json({ success: true, message: "Password updated successfully." });
+            res.status(200).json({ success: true, message: "Password has been reset.", Data: userUpdatedData });
         }
         else {
-            res.status(404).json({ success: false, message: 'Token is expired or invalid.' });
+            res.status(200).json({ success: false, message: 'Token is expired or invalid.' });
         }
 
     }
