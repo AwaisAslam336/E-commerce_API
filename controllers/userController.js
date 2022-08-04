@@ -3,6 +3,33 @@ dotenv.config();
 const User = require('../models/userModel');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const randomstring = require('randomstring');
+const nodemailer = require('nodemailer');
+
+const sendResetPasswordMail = async (name, email, token) => {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Reset your password',
+        html: `<p>Hi `+name+`, Please click this link to <a href="http://localhost:3000//api/reset-password?token=${token}">Reset Your Password</a>.</p>`,
+    }
+    transporter.sendMail(mailOptions, function(err, info) {
+        if (err) {
+            console.log(err);
+        }
+    })
+}
 
 const createToken = async (id) => {
     try {
@@ -83,7 +110,7 @@ const loginUser = async (req, res) => {
 const updatePassword = async (req, res) => {
     const user_id = req.body.user_id;
     const newPassword = (req.body.new_password.toString());
-    if (!user_id  || !newPassword) {
+    if (!user_id || !newPassword) {
         return res.status(400).json({ success: false, message: 'user_id or new_password is missing' });
     }
     try {
@@ -93,7 +120,7 @@ const updatePassword = async (req, res) => {
             const newSecurePassword = await encryptPassword(newPassword);
             await User.findByIdAndUpdate({ _id: user_id },
                 { $set: { password: newSecurePassword } });
-            
+
             res.status(200).json({ success: true, message: "Password updated successfully." });
         }
         else {
@@ -106,8 +133,32 @@ const updatePassword = async (req, res) => {
     }
 }
 
+const forgetPassword = async (req, res) => {
+    const email = req.body.email;
+    try {
+        const userData = await User.findOne({ email: email });
+
+        if (userData) {
+            const randomString = randomstring.generate();
+            await User.updateOne({ email: email }, { $set: { token: randomString } });
+            sendResetPasswordMail(userData.name, userData.email, userData.token)
+            res.status(200).json({
+                success: true,
+                message: "We have sent you a confirmation email, please check your email inbox"
+            });
+        }
+        else {
+            res.status(404).json({ success: false, message: 'Email invalid! Please check your email' });
+        }
+
+    }
+    catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
 module.exports = {
     registerUser,
     loginUser,
-    updatePassword
+    updatePassword,
+    forgetPassword
 }

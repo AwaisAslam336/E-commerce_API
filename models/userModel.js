@@ -23,6 +23,10 @@ const User = mongoose.Schema({
     type: {
         type: Number,
         required: true
+    },
+    token: {
+        type: String,
+        default: ''
     }
 })
 
