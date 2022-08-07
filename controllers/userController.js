@@ -88,14 +88,16 @@ const loginUser = async (req, res) => {
     if (userData) {
         const passwordMatch = await bcryptjs.compare(password, userData.password);
         if (passwordMatch) {
-            const {accessToken, refreshToken} = await createToken(userData._id);
+            const { accessToken, refreshToken } = await createToken(userData._id);
             await User.findByIdAndUpdate({ _id: userData._id },
                 { $set: { refreshToken: refreshToken } });
+            // accessToken needs to be stored in memory but not in locale storage or cookies
             const response = {
                 success: true,
                 message: "User Login Successfully",
                 accessToken: accessToken,
             }
+            // refresh token will be in httpOnly cookies
             res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
             res.status(200).send(response);
         } else {
@@ -104,6 +106,24 @@ const loginUser = async (req, res) => {
     } else {
         res.status(403).send({ success: false, message: 'Login Details are incorrect' });
     }
+}
+
+const logoutUser = async (req, res) => {
+    //On client, also delete the accessToken from memory
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.sendStatus(204); //no refresh token
+    const refreshToken = cookies.jwt;
+
+    const userFoundData = await User.findOne({ refreshToken: refreshToken });
+
+    if (!userFoundData) {
+        res.clearCookie('jwt', { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+        return res.sendStatus(204);
+    }
+    // Delete refresh token in DB
+    await User.findByIdAndUpdate({ _id: userFoundData._id }, { refreshToken: '' });
+    res.clearCookie('jwt', { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); //secure:true in production mode
+    res.status(204).json({ success: true });
 }
 
 const updatePassword = async (req, res) => {
@@ -190,4 +210,5 @@ module.exports = {
     updatePassword,
     forgetPassword,
     resetPassword,
+    logoutUser,
 }

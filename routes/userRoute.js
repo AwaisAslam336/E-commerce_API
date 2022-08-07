@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { registerUser, loginUser, updatePassword, forgetPassword, resetPassword } = require('../controllers/userController');
+const { registerUser, loginUser, updatePassword, forgetPassword, resetPassword, logoutUser } = require('../controllers/userController');
 const path = require('path');
 const {verifyToken} = require('../middlewares/auth');
 
@@ -37,5 +37,7 @@ userRoutes.post('/update-password',verifyToken, updatePassword);
 userRoutes.post('/forget-password',forgetPassword);
 
 userRoutes.post('/reset-password',resetPassword);
+
+userRoutes.get('/logout',logoutUser);
 
 module.exports = {userRoutes};
