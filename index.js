@@ -7,6 +7,7 @@ const {userRoutes} = require('./routes/userRoute');
 const {storeRoutes} = require('./routes/storeRoute');
 const {categoryRoutes} = require('./routes/categoryRoute');
 const {subCategoryRoutes} = require('./routes/subCategoryRoute');
+const {productRoutes} = require('./routes/productRoute');
 const {refreshTokenRoutes} = require('./routes/refreshTokenRoute');
 const cookieParser = require('cookie-parser');
 const app = express();
@@ -22,6 +23,7 @@ app.use('/api/user',userRoutes);
 app.use('/api/store',storeRoutes);
 app.use('/api/category',categoryRoutes);
 app.use('/api/sub-category',subCategoryRoutes);
+app.use('/api/product',productRoutes);
 app.use('/api',refreshTokenRoutes);
 
 app.listen(3000, () => {
