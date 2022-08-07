@@ -1,6 +1,3 @@
-const dotenv = require('dotenv');
-const { response } = require('express');
-dotenv.config();
 const jwt = require('jsonwebtoken');
 
 const verifyToken = async (req, res, next) => {
@@ -14,10 +11,10 @@ const verifyToken = async (req, res, next) => {
     }
 
     try {
-        const decode = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const decode = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         req.user = decode;
     } catch (error) {
-        res.status(400).send({ success: false, message: error.message });
+        return res.status(400).json({ success: false, message: error.message });
     }
     return next();
 }

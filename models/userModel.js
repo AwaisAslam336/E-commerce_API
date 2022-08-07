@@ -24,7 +24,7 @@ const User = mongoose.Schema({
         type: Number,
         required: true
     },
-    token: {
+    refreshToken: {
         type: String,
         default: ''
     }

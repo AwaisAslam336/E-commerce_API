@@ -1,5 +1,3 @@
-const dotenv = require('dotenv');
-dotenv.config();
 const User = require('../models/userModel');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -22,7 +20,7 @@ const sendResetPasswordMail = async (name, email, token) => {
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'Reset your password',
-        html: `<p>Hi ` + name + `, Please click this link to <a href="http://localhost:3000/api/reset-password?token=${token}">Reset Your Password</a>.</p>`,
+        html: `<p>Hi ` + name + `, Please click this link to <a href="http://localhost:3000/api/user/reset-password?refreshToken=${token}">Reset Your Password</a>.</p>`,
     }
     transporter.sendMail(mailOptions, function (err, info) {
         if (err) {
@@ -33,8 +31,16 @@ const sendResetPasswordMail = async (name, email, token) => {
 
 const createToken = async (id) => {
     try {
-        const token = await jwt.sign({ _id: id }, process.env.JWT_SECRET_KEY);
-        return token;
+        const accessToken = jwt.sign(
+            { _id: id },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '5m' });
+        const refreshToken = jwt.sign(
+            { _id: id },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '1d' });
+
+        return { accessToken, refreshToken };
     } catch (error) {
         console.log(error);
     }
@@ -82,22 +88,15 @@ const loginUser = async (req, res) => {
     if (userData) {
         const passwordMatch = await bcryptjs.compare(password, userData.password);
         if (passwordMatch) {
-            const tokenData = await createToken(userData._id);
-            const userResult = {
-                _id: userData._id,
-                name: userData.name,
-                email: userData.email,
-                password: userData.password,
-                image: userData.image,
-                mobile: userData.mobile,
-                type: userData.type,
-                token: tokenData
-            }
+            const {accessToken, refreshToken} = await createToken(userData._id);
+            await User.findByIdAndUpdate({ _id: userData._id },
+                { $set: { refreshToken: refreshToken } });
             const response = {
                 success: true,
-                message: "User Details",
-                data: userResult,
+                message: "User Login Successfully",
+                accessToken: accessToken,
             }
+            res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
             res.status(200).send(response);
         } else {
             res.status(403).send({ success: false, message: 'Login Details are incorrect' });
@@ -140,7 +139,7 @@ const forgetPassword = async (req, res) => {
 
         if (userData) {
             const randomString = randomstring.generate();
-            await User.updateOne({ email: email }, { $set: { token: randomString } });
+            await User.updateOne({ email: email }, { $set: { refreshToken: randomString } });
             sendResetPasswordMail(userData.name, userData.email, randomString)
             res.status(200).json({
                 success: true,
@@ -159,18 +158,18 @@ const forgetPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
 
     try {
-        const token = req.query.token;
+        const token = req.query.refreshToken;
         const newPassword = req.body.new_password ? (req.body.new_password.toString()) : null
         if (!token || !newPassword) {
             return res.status(400).json({ success: false, message: 'Request data is missing' });
         }
-        const data = await User.findOne({ token: token });
+        const data = await User.findOne({ refreshToken: token });
 
         if (data) {
             const newSecurePassword = await encryptPassword(newPassword);
             const user_id = data._id;
             const userUpdatedData = await User.findByIdAndUpdate({ _id: user_id },
-                { $set: { password: newSecurePassword, token: '' } },
+                { $set: { password: newSecurePassword, refreshToken: '' } },
                 { new: true });
 
             res.status(200).json({ success: true, message: "Password has been reset.", Data: userUpdatedData });
