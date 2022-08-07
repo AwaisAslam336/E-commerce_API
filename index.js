@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const {userRoutes} = require('./routes/userRoute');
 const {storeRoutes} = require('./routes/storeRoute');
 const {categoryRoutes} = require('./routes/categoryRoute');
+const {subCategoryRoutes} = require('./routes/subCategoryRoute');
 const {refreshTokenRoutes} = require('./routes/refreshTokenRoute');
 const cookieParser = require('cookie-parser');
 const app = express();
@@ -20,6 +21,7 @@ app.use(cookieParser());
 app.use('/api/user',userRoutes);
 app.use('/api/store',storeRoutes);
 app.use('/api/category',categoryRoutes);
+app.use('/api/sub-category',subCategoryRoutes);
 app.use('/api',refreshTokenRoutes);
 
 app.listen(3000, () => {
