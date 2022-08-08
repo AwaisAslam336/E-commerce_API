@@ -9,11 +9,11 @@ const addCatogory = async (req, res) => {
     try {
         let category = req.body.category;
         category = category ? capitalizeFirstLetter(category.toLowerCase()) : '';
-        const categoryData = await Category.findOne({category:category});
+        const categoryData = await Category.findOne({ category: category });
         if (categoryData) {
             res.status(409).json({ success: false, message: `${category} category already exists` });
         }
-        else{
+        else {
             const newCategory = new Category({
                 category: category
             });
@@ -26,6 +26,14 @@ const addCatogory = async (req, res) => {
     }
 }
 
+const getCategories = async (req, res) => {
+    try {
+        return await Category.find();
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
 module.exports = {
     addCatogory,
+    getCategories
 }

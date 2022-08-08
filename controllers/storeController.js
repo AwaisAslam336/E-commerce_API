@@ -42,6 +42,10 @@ const createStore = async (req, res) => {
     }
 };
 
+const getStore = async (id) => {
+    return await Store.findById({_id: id});
+}
 module.exports = {
     createStore,
+    getStore,
 }
