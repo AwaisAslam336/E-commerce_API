@@ -67,7 +67,24 @@ const getAllProduct = async (req, res) => {
     }
 }
 
+const searchProduct = async (req, res) => {
+    try {
+        const search = req.query.search;
+        const productData = await Product.find({ name: { $regex: '.*' + search + '.*', $options: 'i' } });
+        if (productData.length > 0) {
+            res.status(200).json({ success: true, message: "Founded Products", data: productData });
+        }
+        else {
+            res.status(200).json({ success: true, message: "No Products Found"});
+        }
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+
+}
+
 module.exports = {
     addProduct,
     getAllProduct,
+    searchProduct
 }

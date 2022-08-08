@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { addProduct, getAllProduct } = require('../controllers/productController');
+const { addProduct, getAllProduct, searchProduct } = require('../controllers/productController');
 const path = require('path');
 const {verifyToken} = require('../middlewares/auth');
 
@@ -27,5 +27,7 @@ const upload = multer({ storage: storage });
 productRoutes.post('/add', upload.array('images'), verifyToken, addProduct);
 
 productRoutes.get('/get', verifyToken, getAllProduct);
+
+productRoutes.get('/search', verifyToken, searchProduct);
 
 module.exports = {productRoutes};
