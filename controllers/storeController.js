@@ -70,8 +70,18 @@ const findNearestStore = async (req, res) => {
     }
 }
 
+const countStores = async (req, res) => {
+    try {
+        const countData = await Store.find().count();
+        res.status(200).json({ success: true, Stores: countData });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     createStore,
     getStore,
-    findNearestStore
+    findNearestStore,
+    countStores
 }

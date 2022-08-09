@@ -1,8 +1,14 @@
 const express = require('express');
 const multer = require('multer');
-const { registerUser, loginUser, updatePassword, forgetPassword, resetPassword, logoutUser } = require('../controllers/userController');
+const { registerUser,
+    loginUser,
+    updatePassword,
+    forgetPassword,
+    resetPassword,
+    countVendors,
+    logoutUser } = require('../controllers/userController');
 const path = require('path');
-const {verifyToken} = require('../middlewares/auth');
+const { verifyToken } = require('../middlewares/auth');
 
 const userRoutes = express();
 
@@ -28,16 +34,18 @@ userRoutes.post('/register', upload.single('image'), registerUser);
 
 userRoutes.post('/login', loginUser);
 
-userRoutes.get('/test',verifyToken, function (req, res) {
+userRoutes.get('/test', verifyToken, function (req, res) {
     res.status(200).json('OKkk');
 });
 
-userRoutes.post('/update-password',verifyToken, updatePassword);
+userRoutes.post('/update-password', verifyToken, updatePassword);
 
-userRoutes.post('/forget-password',forgetPassword);
+userRoutes.post('/forget-password', forgetPassword);
 
-userRoutes.post('/reset-password',resetPassword);
+userRoutes.post('/reset-password', resetPassword);
 
-userRoutes.get('/logout',logoutUser);
+userRoutes.get('/logout', verifyToken, logoutUser);
 
-module.exports = {userRoutes};
+userRoutes.get('/count', verifyToken, countVendors);
+
+module.exports = { userRoutes };

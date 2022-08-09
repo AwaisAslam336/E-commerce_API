@@ -33,7 +33,18 @@ const getCategories = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 }
+
+const countCategories = async (req, res) => {
+    try {
+        const countData = await Category.find().count();
+        res.status(200).json({ success: true, Categories: countData });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     addCatogory,
-    getCategories
+    getCategories,
+    countCategories,
 }

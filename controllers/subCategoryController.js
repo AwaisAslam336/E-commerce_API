@@ -1,4 +1,3 @@
-const Category = require('../models/categoryModel');
 const SubCategory = require('../models/SubCategoryModel');
 
 function capitalizeFirstLetter(str) {
@@ -32,6 +31,16 @@ const addSubCatogory = async (req, res) => {
     }
 }
 
+const countSubCategories = async (req, res) => {
+    try {
+        const countData = await SubCategory.find().count();
+        res.status(200).json({ success: true, SubCategories: countData });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     addSubCatogory,
+    countSubCategories
 }

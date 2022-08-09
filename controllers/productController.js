@@ -83,8 +83,18 @@ const searchProduct = async (req, res) => {
 
 }
 
+const countProducts = async (req, res) => {
+    try {
+        const countData = await Product.find().count();
+        res.status(200).json({ success: true, Products: countData });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     addProduct,
     getAllProduct,
-    searchProduct
+    searchProduct,
+    countProducts
 }

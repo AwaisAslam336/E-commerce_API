@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const {verifyToken} = require('../middlewares/auth');
-const { createStore, findNearestStore } = require('../controllers/storeController');
+const { createStore, findNearestStore, countStores } = require('../controllers/storeController');
 
 const storeRoutes = express();
 
@@ -23,6 +23,9 @@ const storage = multer.diskStorage({
 const uploader = multer({ storage: storage });
 
 storeRoutes.post('/create', verifyToken, uploader.single('logo'), createStore);
+
 storeRoutes.post('/find-nearest', verifyToken, findNearestStore);
+
+storeRoutes.get('/count', verifyToken, countStores);
 
 module.exports = { storeRoutes }
