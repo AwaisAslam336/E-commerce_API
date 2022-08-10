@@ -74,7 +74,7 @@ const registerUser = async (req, res) => {
                 });
         }
         const userData = await user.save();
-        return res.status(200).send({ success: true, userData: userData });
+        return res.status(201).send({ success: true, userData: userData });
     }
     catch (error) {
         res.status(400).send(error.message);

@@ -1,33 +1,19 @@
+const http = require('http');
 const dotenv = require('dotenv');
 dotenv.config();
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const {userRoutes} = require('./routes/userRoute');
-const {storeRoutes} = require('./routes/storeRoute');
-const {categoryRoutes} = require('./routes/categoryRoute');
-const {subCategoryRoutes} = require('./routes/subCategoryRoute');
-const {productRoutes} = require('./routes/productRoute');
-const {cartRoutes} = require('./routes/cartRoute');
-const {refreshTokenRoutes} = require('./routes/refreshTokenRoute');
-const cookieParser = require('cookie-parser');
-const app = express();
+const app = require('./app');
+const { mongoConnect } = require('./services/mongo');
 
-mongoose.connect('mongodb://127.0.0.1:27017/ECOM');
+const PORT = process.env.PORT || 8000;
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
-app.use(cookieParser());
+const server = http.createServer(app);
 
-app.use('/api/user',userRoutes);
-app.use('/api/store',storeRoutes);
-app.use('/api/category',categoryRoutes);
-app.use('/api/sub-category',subCategoryRoutes);
-app.use('/api/product',productRoutes);
-app.use('/api/cart',cartRoutes);
-app.use('/api',refreshTokenRoutes);
+async function startServer() {
+    await mongoConnect();
 
-app.listen(3000, () => {
-    console.log('server is ready');
-})
+    server.listen(PORT, () => {
+        console.log(`Listening on port ${PORT}...`);
+    });
+}
+
+startServer();
