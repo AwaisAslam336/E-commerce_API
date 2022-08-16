@@ -18,8 +18,8 @@ describe('E commerce API', () => {
     describe('Test POST /register', () => {
         const img = path.join(__dirname, '../public/storeImages/test_image.jpg');
         const randString = Math.random().toString(36).slice(2);
-        
-        test('It should respond with 201 created', async () => {
+
+        test('It should respond with 201 created and success is true', async () => {
 
             const response = await request(app)
                 .post('/api/user/register')
@@ -31,7 +31,25 @@ describe('E commerce API', () => {
                 .field('mobile', '12345')
                 .expect(201)
 
-            console.log(response)
+            expect(response.body.success).toBe(true);
+            
+        });
+    });
+
+    describe('Test POST /login', () => {
+
+        test('It should respond with 200 and a accessToken', async () => {
+
+            const response = await request(app)
+                .post('/api/user/login')
+                .send({
+                    email: 'awaisaslam336@gmail.com',
+                    password: '123',
+                })
+                .expect(200)
+            expect(response.body && response.body.success).toBe(true);
+            expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+            expect(response.body.accessToken).toBeDefined();
         });
     });
 

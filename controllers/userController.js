@@ -91,15 +91,10 @@ const loginUser = async (req, res) => {
             const { accessToken, refreshToken } = await createToken(userData._id);
             await User.findByIdAndUpdate({ _id: userData._id },
                 { $set: { refreshToken: refreshToken } });
-            // accessToken needs to be stored in memory but not in locale storage or cookies
-            const response = {
-                success: true,
-                message: "User Login Successfully",
-                accessToken: accessToken,
-            }
             // refresh token will be in httpOnly cookies
             res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-            res.status(200).send(response);
+            // accessToken needs to be stored in memory but not in locale storage or cookies
+            res.status(200).send({ success: true, message: "User Login Successfully", accessToken: accessToken, });
         } else {
             res.status(403).send({ success: false, message: 'Login Details are incorrect' });
         }
