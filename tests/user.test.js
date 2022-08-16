@@ -15,9 +15,10 @@ describe('E commerce API', () => {
         await mongoDisconnect();
     });
 
+    const randString = Math.random().toString(36).slice(2);
+
     describe('Test POST /register', () => {
         const img = path.join(__dirname, '../public/storeImages/test_image.jpg');
-        const randString = Math.random().toString(36).slice(2);
 
         test('It should respond with 201 created and success is true', async () => {
 
@@ -43,8 +44,8 @@ describe('E commerce API', () => {
             const response = await request(app)
                 .post('/api/user/login')
                 .send({
-                    email: 'awaisaslam336@gmail.com',
-                    password: '123',
+                    email: `${randString}@gmail.com`,
+                    password: '1234',
                 })
                 .expect(200)
             expect(response.body && response.body.success).toBe(true);
