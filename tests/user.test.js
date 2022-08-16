@@ -24,7 +24,7 @@ describe('E commerce API', () => {
 
             const response = await request(app)
                 .post('/api/user/register')
-                .attach('image', img)
+                //.attach('image', img)
                 .field('name', 'test name')
                 .field('email', `${randString}@gmail.com`)
                 .field('password', '1234')
