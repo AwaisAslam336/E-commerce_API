@@ -24,13 +24,15 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Create .env file
-        uses: ozaytsev86/create-env-file@v1
+        uses: SpicyPizza/create-envfile@v1.3
         with:
-          ENV_ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
-          ENV_REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
-          ENV_EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          ENV_EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          ENV_MONGO_URL: ${{ secrets.MONGO_URL }}
+          envkey_DEBUG: false
+          envkey_PORT: 3000
+          envkey_ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          envkey_REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+          envkey_EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          envkey_EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          envkey_MONGO_URL: ${{ secrets.MONGO_URL }}
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.7.0
