@@ -23,6 +23,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Create .env file
+        uses: ozaytsev86/create-env-file@v1
+        with:
+          ENV_ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          ENV_REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+          ENV_EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          ENV_EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          ENV_MONGO_URL: ${{ secrets.MONGO_URL }}
+
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.7.0
         with:
