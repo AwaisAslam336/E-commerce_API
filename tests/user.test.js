@@ -37,21 +37,21 @@ describe('E commerce API', () => {
         });
     });
 
-    describe('Test POST /login', () => {
+    // describe('Test POST /login', () => {
 
-        test('It should respond with 200 and a accessToken', async () => {
+    //     test('It should respond with 200 and a accessToken', async () => {
 
-            const response = await request(app)
-                .post('/api/user/login')
-                .send({
-                    email: `${randString}@gmail.com`,
-                    password: '1234',
-                })
-                .expect(200)
-            expect(response.body && response.body.success).toBe(true);
-            expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
-            expect(response.body.accessToken).toBeDefined();
-        });
-    });
+    //         const response = await request(app)
+    //             .post('/api/user/login')
+    //             .send({
+    //                 email: `${randString}@gmail.com`,
+    //                 password: '1234',
+    //             })
+    //             .expect(200)
+    //         expect(response.body && response.body.success).toBe(true);
+    //         expect(response.headers['content-type']).toEqual(expect.stringContaining('json'));
+    //         expect(response.body.accessToken).toBeDefined();
+    //     });
+    // });
 
 });
